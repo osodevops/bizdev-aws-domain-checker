@@ -3,34 +3,36 @@
 """Return if a website or subdomains are hosted on AWS.
 
 Usage:
-  ip-checker check (--website-file FILE) [--export] [-vd]
+  ip-checker check (--website-file FILE) [--export-json] [--export-csv] [-vd]
   ip-checker --version
   ip-checker --help
 
 Modes of operation:
-  check         Display if site is hosted in AWS.
+  check                         Display if site is hosted in AWS.
 
 Options:
   -h, --help                    Show this help message and exit.
   --version                     Display version info and exit.
   -w FILE, --website-file FILE  List of websites / urls to check in JSON format. (../big_data_london_exhibitors.json)
-  --export                      Exports results to a JSON file.
+  --export-json                 Exports results to a JSON file.
+  --export-csv                  Exports results in CSV format.
   -v, --verbose                 Log to activity to STDOUT at log level INFO.
   -d, --debug                   Increase log level to 'DEBUG'. Implies '--verbose'.
 
 """
-
+import csv
 import json
 import logging
 import urllib.request
 import socket
+from tabulate import tabulate
 
 from docopt import docopt
 from netaddr import IPNetwork, IPAddress
 import tldextract
 
 IP_RANGE_SOURCE_ADDRESS = "https://ip-ranges.amazonaws.com/ip-ranges.json"
-EXPORT_FILENAME = 'results.json'
+EXPORT_FILENAME = 'results'
 
 def get_logger(args):
     """
@@ -47,7 +49,7 @@ def get_logger(args):
     log_format = '%(name)s: %(levelname)-9s%(message)s'
     if args['--debug']:
         log_format = '%(name)s: %(levelname)-9s%(funcName)s():  %(message)s'
-    if (('--export' in args and not args['--export']) and not args['check']):
+    if (('--export-json' in args and not args['--export-json']) and not args['check']):
         log_format = '[dryrun] %s' % log_format
 
     logFormatter = logging.Formatter(log_format)
@@ -113,12 +115,28 @@ def check_websites_against_ip_ranges(log, args, ip_ranges, website_list):
 
     if len(results) > 0:
         log.info("Found: %s matches." % (len(results)))
+        print('\n')
+        print('Results: %s' % (len(results)))
+        print(tabulate(results))
 
-    #write result to file if --export flag is set
-    if args['--export']:
-        log.debug("Exporting data to file: %s" %(EXPORT_FILENAME))
-        with open(EXPORT_FILENAME, 'w') as outfile:
+    #write result to file if --export-json flag is set
+    if args['--export-json']:
+        log.debug("Exporting data to file: %s.json" %(EXPORT_FILENAME))
+        with open(EXPORT_FILENAME + '.json', 'w') as outfile:
             json.dump(results, outfile)
+
+    #write results to csv file if export-csv flaf is set
+    if args['--export-csv']:
+        log.debug("Exporting data to file: %s.csv" %(EXPORT_FILENAME))
+        with open(EXPORT_FILENAME + '.csv', mode='w') as outfile:
+            csvwriter = csv.writer(outfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            count = 0
+            for result in results:
+                if count == 0:
+                    header = result.keys()
+                    csvwriter.writerow(header)
+                    count += 1
+                csvwriter.writerow(result.values())
 
 
 def main():
