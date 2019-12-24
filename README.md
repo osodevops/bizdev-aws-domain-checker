@@ -4,8 +4,8 @@ Python util script to parse a list of URLs and checkers each against public IP r
 Run as a Docker container:
 
 ~~~bash
-git clone https://github.com/osodevops/bizdev-waf-checker
-cd bizdev-waf-checker
+git clone https://github.com/osodevops/bizdev-aws-domain-checker
+cd bizdev-aws-domain-checker
 docker build -t osodevops/aws-domain-checker .
 
 # Call it without arguments to display the full help
