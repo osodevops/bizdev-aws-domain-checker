@@ -3,7 +3,7 @@
 """Return if a website or subdomains are hosted on AWS.
 
 Usage:
-  ip-checker check (--website-file FILE) [--export-json] [--export-csv] [-vd]
+  ip-checker check (--website-list FILE) [--export-json=<filename>] [--export-csv=<filename>] [-vd]
   ip-checker --version
   ip-checker --help
 
@@ -13,9 +13,9 @@ Modes of operation:
 Options:
   -h, --help                    Show this help message and exit.
   --version                     Display version info and exit.
-  -w FILE, --website-file FILE  List of websites / urls to check in JSON format. (../big_data_london_exhibitors.json)
-  --export-json                 Exports results to a JSON file.
-  --export-csv                  Exports results in CSV format.
+  -w FILE, --website-list FILE  List of websites / urls to check in JSON format. (../big_data_london_exhibitors.json)
+  --export-json<filename>       Exports results to a JSON file.
+  --export-csv<filename>        Exports results in CSV format.
   -v, --verbose                 Log to activity to STDOUT at log level INFO.
   -d, --debug                   Increase log level to 'DEBUG'. Implies '--verbose'.
 
@@ -32,7 +32,6 @@ from netaddr import IPNetwork, IPAddress
 import tldextract
 
 IP_RANGE_SOURCE_ADDRESS = "https://ip-ranges.amazonaws.com/ip-ranges.json"
-EXPORT_FILENAME = 'results'
 
 def get_logger(args):
     """
@@ -121,14 +120,14 @@ def check_websites_against_ip_ranges(log, args, ip_ranges, website_list):
 
     #write result to file if --export-json flag is set
     if args['--export-json']:
-        log.debug("Exporting data to file: %s.json" %(EXPORT_FILENAME))
-        with open(EXPORT_FILENAME + '.json', 'w') as outfile:
+        log.debug("Exporting data to file: %s.json" %(args['--export-json']))
+        with open(args['--export-json'], 'w') as outfile:
             json.dump(results, outfile)
 
     #write results to csv file if export-csv flaf is set
     if args['--export-csv']:
-        log.debug("Exporting data to file: %s.csv" %(EXPORT_FILENAME))
-        with open(EXPORT_FILENAME + '.csv', mode='w') as outfile:
+        log.debug("Exporting data to file: %s.csv" %(args['--export-csv']))
+        with open(args['--export-csv'], mode='w') as outfile:
             csvwriter = csv.writer(outfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             count = 0
             for result in results:
@@ -149,7 +148,7 @@ def main():
 
     #load websites from file
     log.info("Loading website urls...")
-    website_list = load_websites_from_file(log, args['--website-file'])
+    website_list = load_websites_from_file(log, args['--website-list'])
 
     #check websites against AWS ranges
     log.info("Checking websites against AWS IP ranges...")
