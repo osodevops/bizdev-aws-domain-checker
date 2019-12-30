@@ -54,13 +54,10 @@ def get_logger(args):
     logFormatter = logging.Formatter(log_format)
     rootLogger = logging.getLogger()
     rootLogger.setLevel(log_level)
-
     #add console appened
     consoleHandler = logging.StreamHandler()
     consoleHandler.setFormatter(logFormatter)
-
     rootLogger.addHandler(consoleHandler)
-
     return rootLogger
 
 
