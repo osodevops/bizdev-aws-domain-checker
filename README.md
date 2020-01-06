@@ -11,6 +11,10 @@ docker build -t osodevops/aws-domain-checker .
 # Call it without arguments to display the full help
 docker run --rm osodevops/aws-domain-checker:latest
 
+# Call it single domain to display result.
+docker run --rm osodevops/aws-domain-checker:latest check --url www.google.com
+
+
 # Basic usage - pass in the URLs with mounted volume:
 docker run --rm -v $(pwd):/tmp osodevops/aws-domain-checker:latest check --website-list ./tmp/big_data_london_exhibitors.json
 

@@ -4,6 +4,7 @@
 
 Usage:
   ip-checker check (--website-list FILE) [--export-json=<filename>] [--export-csv=<filename>] [-vd]
+  ip-checker check (--url=<url>) [--export-json=<filename>] [--export-csv=<filename>] [-vd]
   ip-checker --version
   ip-checker --help
 
@@ -12,6 +13,7 @@ Modes of operation:
 
 Options:
   -h, --help                    Show this help message and exit.
+  --url<url>                     URL to check.
   --version                     Display version info and exit.
   -w FILE, --website-list FILE  List of websites / urls to check in JSON format. (../big_data_london_exhibitors.json)
   --export-json<filename>       Exports results to a JSON file.
@@ -114,6 +116,8 @@ def check_websites_against_ip_ranges(log, args, ip_ranges, website_list):
         print('\n')
         print('Results: %s' % (len(results)))
         print(tabulate(results))
+    else:
+        log.info("Found no results. All domains are not hosted on AWS.")
 
     #write result to file if --export-json flag is set
     if args['--export-json']:
@@ -143,9 +147,13 @@ def main():
     log.info("Loading AWS IP Ranges...")
     ip_ranges = load_aws_ip_ranges(log, IP_RANGE_SOURCE_ADDRESS)
 
-    #load websites from file
-    log.info("Loading website urls...")
-    website_list = load_websites_from_file(log, args['--website-list'])
+    if args['--url']:
+        log.debug("Running against single target: %s" %(args['--url']))
+        website_list = [clean_website_address(log, args['--url'])]
+    else:
+        #load websites from file
+        log.info("Loading website urls...")
+        website_list = load_websites_from_file(log, args['--website-list'])
 
     #check websites against AWS ranges
     log.info("Checking websites against AWS IP ranges...")
