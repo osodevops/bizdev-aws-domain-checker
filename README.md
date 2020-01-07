@@ -14,7 +14,6 @@ docker run --rm osodevops/aws-domain-checker
 # Call it single domain to display result.
 docker run --rm osodevops/aws-domain-checker check --url www.osodevops.io
 
-
 # Basic usage - pass in the URLs with mounted volume:
 docker run --rm -v $(pwd):/tmp osodevops/aws-domain-checker:latest check --website-list ./tmp/big_data_london_exhibitors.json
 
