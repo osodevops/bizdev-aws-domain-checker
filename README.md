@@ -9,10 +9,10 @@ cd bizdev-aws-domain-checker
 docker build -t osodevops/aws-domain-checker .
 
 # Call it without arguments to display the full help
-docker run --rm osodevops/aws-domain-checker:latest
+docker run --rm osodevops/aws-domain-checker
 
 # Call it single domain to display result.
-docker run --rm osodevops/aws-domain-checker:latest check --url www.google.com
+docker run --rm osodevops/aws-domain-checker check --url www.osodevops.io
 
 
 # Basic usage - pass in the URLs with mounted volume:
