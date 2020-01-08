@@ -1,6 +1,10 @@
 # OSO DevOps BizDev - Part 1
 Python util script to parse a list of URLs and checkers each against public IP ranges of all AWS services.
 
+###Demo
+![AWS Domain Chccjer Demo](demo/aws-checker-small.gif) 
+
+###Usage
 Run as a Docker container:
 
 ~~~bash
